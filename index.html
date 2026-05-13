@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LANCHAQUI - Pedido de Pizza</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --amarelo:#f5c400;
+    --verde:#08952d;
+    --vermelho:#f3160d;
+    --branco:#ffffff;
+    --cinza:#f2f2f2;
+    --texto:#333;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:var(--amarelo);
+    font-family:'Baloo 2', cursive;
+    color:var(--texto);
+    padding:20px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+}
+
+.logo{
+    width:220px;
+    display:block;
+    margin:0 auto 20px auto;
+}
+
+.card{
+    background:white;
+    border-radius:28px;
+    padding:22px;
+    margin-bottom:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.12);
+}
+
+h2{
+    color:var(--verde);
+    margin-bottom:15px;
+    font-size:28px;
+}
+
+h3{
+    margin-bottom:12px;
+    color:var(--vermelho);
+}
+
+.tipo-pizza{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.tipo-btn{
+    flex:1;
+    border:none;
+    padding:14px;
+    border-radius:18px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    background:#eee;
+    transition:0.3s;
+}
+
+.tipo-btn.active{
+    background:var(--verde);
+    color:white;
+}
+
+.pizza-preview{
+    width:240px;
+    height:240px;
+    border-radius:50%;
+    margin:20px auto;
+    overflow:hidden;
+    border:12px solid #dca45f;
+    position:relative;
+    background:#f8e6b0;
+}
+
+.metade{
+    position:absolute;
+    width:100%;
+    height:100%;
+}
+
+.metade1{
+    clip-path:polygon(0 0, 50% 50%, 0 100%);
+}
+
+.metade2{
+    clip-path:polygon(100% 0, 50% 50%, 100% 100%);
+}
+
+.sabor-box{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+select{
+    width:100%;
+    padding:14px;
+    border-radius:16px;
+    border:2px solid #ddd;
+    font-size:17px;
+    font-family:'Baloo 2', cursive;
+}
+
+.opcoes{
+    display:grid;
+    gap:12px;
+}
+
+.opcao{
+    background:#fafafa;
+    padding:14px;
+    border-radius:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border:2px solid transparent;
+}
+
+.opcao input{
+    transform:scale(1.3);
+}
+
+.opcao.selecionado{
+    border-color:var(--verde);
+    background:#eaf9ef;
+}
+
+input, textarea{
+    width:100%;
+    padding:14px;
+    border-radius:16px;
+    border:2px solid #ddd;
+    font-size:17px;
+    margin-bottom:14px;
+    font-family:'Baloo 2', cursive;
+}
+
+.total{
+    position:sticky;
+    bottom:10px;
+    background:var(--vermelho);
+    color:white;
+    padding:18px;
+    border-radius:22px;
+    font-size:28px;
+    text-align:center;
+    font-weight:bold;
+    box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+.botao{
+    width:100%;
+    background:var(--verde);
+    color:white;
+    border:none;
+    padding:18px;
+    border-radius:20px;
+    font-size:24px;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:20px;
+    transition:0.3s;
+}
+
+.botao:hover{
+    transform:scale(1.02);
+}
+
+@media(max-width:600px){
+
+.sabor-box{
+    grid-template-columns:1fr;
+}
+
+.pizza-preview{
+    width:200px;
+    height:200px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<img src="lanchaqui.png" class="logo">
+
+<div class="card">
+
+<h2>🍕 Monte sua Pizza</h2>
+
+<div class="tipo-pizza">
+<button class="tipo-btn active" onclick="setTipo(1,this)">1 Sabor</button>
+<button class="tipo-btn" onclick="setTipo(2,this)">2 Sabores</button>
+</div>
+
+<div class="pizza-preview">
+
+<div class="metade metade1" id="metade1"></div>
+<div class="metade metade2" id="metade2"></div>
+
+</div>
+
+<div class="sabor-box">
+
+<div>
+<h3>Sabor 1</h3>
+
+<select id="sabor1" onchange="atualizarPizza()">
+<option value="">Escolha</option>
+<option value="calabresa">Calabresa</option>
+<option value="mista">Mista</option>
+<option value="xtudo">X Tudo</option>
+<option value="frango">Frango com Catupiry</option>
+<option value="nordestina">Nordestina</option>
+</select>
+</div>
+
+<div id="segundoSabor" style="display:none;">
+<h3>Sabor 2</h3>
+
+<select id="sabor2" onchange="atualizarPizza()">
+<option value="">Escolha</option>
+<option value="calabresa">Calabresa</option>
+<option value="mista">Mista</option>
+<option value="xtudo">X Tudo</option>
+<option value="frango">Frango com Catupiry</option>
+<option value="nordestina">Nordestina</option>
+</select>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>📏 Tamanho</h2>
+
+<div class="opcoes">
+
+<label class="opcao">
+<span>Pizza Pequena - R$29,90</span>
+<input type="radio" name="tamanho" value="29.90" onchange="calcularTotal()">
+</label>
+
+<label class="opcao">
+<span>Pizza Média - R$35,90</span>
+<input type="radio" name="tamanho" value="35.90" onchange="calcularTotal()">
+</label>
+
+<label class="opcao">
+<span>Pizza Grande - R$44,90</span>
+<input type="radio" name="tamanho" value="44.90" onchange="calcularTotal()">
+</label>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🥤 Refrigerantes</h2>
+
+<div class="opcoes">
+
+<label class="opcao">
+<span>Refri 1L - R$9,99</span>
+<input type="radio" name="refri" value="9.99" onchange="calcularTotal()">
+</label>
+
+<label class="opcao">
+<span>Refri 2L - R$14,99</span>
+<input type="radio" name="refri" value="14.99" onchange="calcularTotal()">
+</label>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🍟 Aperitivos</h2>
+
+<div class="opcoes">
+
+<label class="opcao">
+<span>CHIPS DE MACAXEIRA COM CHEDDAR - R$14,99</span>
+<input type="checkbox" value="14.99" onchange="calcularTotal()">
+</label>
+
+<label class="opcao">
+<span>CALABRESA ACEBOLADA - R$14,99</span>
+<input type="checkbox" value="14.99" onchange="calcularTotal()">
+</label>
+
+<label class="opcao">
+<span>PORÇÃO DE PASTEIZINHOS - R$14,99</span>
+<input type="checkbox" value="14.99" onchange="calcularTotal()">
+</label>
+
+<label class="opcao">
+<span>PROMOÇÃO DE BATATAS FRITAS - R$14,99</span>
+<input type="checkbox" value="14.99" onchange="calcularTotal()">
+</label>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>📋 Dados do Pedido</h2>
+
+<input type="text" id="nome" placeholder="Nome Completo">
+
+<textarea rows="3" id="endereco" placeholder="Endereço completo"></textarea>
+
+<select id="pagamento">
+<option>Forma de pagamento</option>
+<option>Pix</option>
+<option>Cartão</option>
+<option>Dinheiro</option>
+</select>
+
+<button class="botao" onclick="enviarPedido()">
+FINALIZAR PEDIDO 🍕
+</button>
+
+</div>
+
+<div class="total" id="total">
+TOTAL: R$ 0,00
+</div>
+
+</div>
+
+<script>
+
+let tipoPizza = 1;
+
+const coresSabores = {
+    calabresa:"#d62828",
+    mista:"#d98c3f",
+    xtudo:"#8b4513",
+    frango:"#f4d06f",
+    nordestina:"#c96b28"
+};
+
+function setTipo(tipo,el){
+
+    tipoPizza = tipo;
+
+    document.querySelectorAll('.tipo-btn').forEach(btn=>{
+        btn.classList.remove('active');
+    });
+
+    el.classList.add('active');
+
+    document.getElementById('segundoSabor').style.display =
+        tipo == 2 ? 'block' : 'none';
+
+    atualizarPizza();
+}
+
+function atualizarPizza(){
+
+    const sabor1 =
+    document.getElementById('sabor1').value;
+
+    const sabor2 =
+    document.getElementById('sabor2').value;
+
+    const metade1 =
+    document.getElementById('metade1');
+
+    const metade2 =
+    document.getElementById('metade2');
+
+    metade1.style.background =
+    coresSabores[sabor1] || "#f8e6b0";
+
+    if(tipoPizza == 2){
+
+        metade2.style.display = "block";
+
+        metade2.style.background =
+        coresSabores[sabor2] || "#f8e6b0";
+
+    }else{
+
+        metade2.style.display = "none";
+
+        metade1.style.clipPath = "none";
+    }
+
+    if(tipoPizza == 2){
+
+        metade1.style.clipPath =
+        "polygon(0 0, 50% 50%, 0 100%)";
+
+    }
+}
+
+function calcularTotal(){
+
+    let total = 0;
+
+    const tamanho =
+    document.querySelector('input[name="tamanho"]:checked');
+
+    if(tamanho){
+        total += parseFloat(tamanho.value);
+    }
+
+    const refri =
+    document.querySelector('input[name="refri"]:checked');
+
+    if(refri){
+        total += parseFloat(refri.value);
+    }
+
+    const aperitivos =
+    document.querySelectorAll('input[type="checkbox"]:checked');
+
+    aperitivos.forEach(item=>{
+        total += parseFloat(item.value);
+    });
+
+    document.getElementById('total').innerHTML =
+    "TOTAL: R$ " + total.toFixed(2).replace('.',',');
+
+    atualizarBordas();
+}
+
+function atualizarBordas(){
+
+    document.querySelectorAll('.opcao').forEach(op=>{
+
+        op.classList.remove('selecionado');
+
+        const input = op.querySelector('input');
+
+        if(input.checked){
+            op.classList.add('selecionado');
+        }
+    });
+}
+
+function enviarPedido(){
+
+    const nome =
+    document.getElementById('nome').value;
+
+    const endereco =
+    document.getElementById('endereco').value;
+
+    const pagamento =
+    document.getElementById('pagamento').value;
+
+    const sabor1 =
+    document.getElementById('sabor1').value;
+
+    const sabor2 =
+    document.getElementById('sabor2').value;
+
+    let saboresTexto = "";
+
+    if(tipoPizza == 1){
+
+        saboresTexto =
+        "🍕 Pizza Inteira: " + sabor1;
+
+    }else{
+
+        saboresTexto =
+        "🍕 Meio a Meio: " +
+        sabor1 + " / " + sabor2;
+    }
+
+    let tamanhoTexto = "";
+    let valorPizza = 0;
+
+    const tamanhoSelecionado =
+    document.querySelector('input[name="tamanho"]:checked');
+
+    if(tamanhoSelecionado){
+
+        valorPizza =
+        parseFloat(tamanhoSelecionado.value);
+
+        if(valorPizza == 29.90){
+            tamanhoTexto = "Pequena";
+        }
+
+        if(valorPizza == 35.90){
+            tamanhoTexto = "Média";
+        }
+
+        if(valorPizza == 44.90){
+            tamanhoTexto = "Grande";
+        }
+    }
+
+    let refriTexto = "Nenhum";
+    let valorRefri = 0;
+
+    const refriSelecionado =
+    document.querySelector('input[name="refri"]:checked');
+
+    if(refriSelecionado){
+
+        valorRefri =
+        parseFloat(refriSelecionado.value);
+
+        if(valorRefri == 9.99){
+            refriTexto = "Refri 1L";
+        }
+
+        if(valorRefri == 14.99){
+            refriTexto = "Refri 2L";
+        }
+    }
+
+    let aperitivosTexto = "";
+    let totalAperitivos = 0;
+
+    const aperitivos =
+    document.querySelectorAll('input[type="checkbox"]:checked');
+
+    aperitivos.forEach(item=>{
+
+        totalAperitivos += parseFloat(item.value);
+
+        const texto =
+        item.parentElement.innerText
+        .replace("R$14,99","")
+        .trim();
+
+        aperitivosTexto += "• " + texto + "%0A";
+    });
+
+    const total =
+    valorPizza + valorRefri + totalAperitivos;
+
+    const mensagem =
+
+`🍕 *NOVO PEDIDO - LANCHAQUI* %0A%0A
+
+👤 *Cliente:* ${nome}%0A
+
+📍 *Endereço:* ${endereco}%0A
+
+${saboresTexto}%0A
+
+📏 *Tamanho:* ${tamanhoTexto}%0A
+
+🥤 *Bebida:* ${refriTexto}%0A
+
+🍟 *Aperitivos:* %0A${aperitivosTexto || "Nenhum%0A"}
+
+💳 *Pagamento:* ${pagamento}%0A
+
+💰 *TOTAL:* R$ ${total.toFixed(2).replace('.',',')}`;
+
+    const telefone = "5588993082035";
+
+    window.open(
+        `https://wa.me/${telefone}?text=${mensagem}`,
+        '_blank'
+    );
+}
+
+</script>
+
+</body>
+</html>
